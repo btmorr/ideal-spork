@@ -1,4 +1,4 @@
-organization := "ai.x"
+organization := "com.github.btmorr"
 
 name := "harmonia"
 
