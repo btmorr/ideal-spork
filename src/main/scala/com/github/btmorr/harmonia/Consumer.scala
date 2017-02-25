@@ -9,6 +9,7 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import com.datastax.spark.connector.SomeColumns
 import com.datastax.spark.connector.streaming._
 import java.util.UUID
+import scala.sys.process._
 
 case class Message(message: String) {
   val id = UUID.randomUUID()
@@ -49,7 +50,10 @@ object Consumer extends App {
     Subscribe[String, String](topics, kafkaParams)
   )
 
-  val msgs = stream.map(record => Message(record.value))
+  val msgs = stream.map(record => {
+    s"say ${record.value}".!
+    Message(record.value)
+  })
   msgs.saveToCassandra(keyspace, table, SomeColumns("id", "message", "len"))
 
   ssc.start()

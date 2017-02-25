@@ -28,7 +28,10 @@ object Producer extends App {
 
   val producer = initializeProducer("localhost:9092")
 
-  producer.send("thisThing")
-  producer.send("thatOtherThing")
-  //not working yet
+  val messages = List("So glad I'm never going to have children")
+  messages foreach { msg =>
+    val resp = producer.send(msg).get()
+    println(s"Sending message: $msg - Response: $resp")
+  }
+
 }
