@@ -72,3 +72,7 @@ After sending some messages through, view them by:
 ```
 cqlsh> select * from test.messages
 ```
+
+## Running the application
+
+Start the Consumer and the Producer, then navigate to [localhost:8080](http://localhost:8080). The root page won't display anything at the moment, but you can hit the "send" route and add body text under the [`msg` parameter](http://localhost:8080/send?msg=hello-world) to send a message along and have the computer say it.

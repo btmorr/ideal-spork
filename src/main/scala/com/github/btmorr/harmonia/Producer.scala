@@ -1,5 +1,10 @@
 package com.github.btmorr.harmonia
 
+import org.http4s._
+import org.http4s.dsl._
+import org.http4s.server.{ Server, ServerApp }
+import org.http4s.server.blaze._
+import scalaz.concurrent.Task
 import org.apache.kafka.clients.producer.{ KafkaProducer, ProducerRecord }
 
 /* The Producer just sends some preset messages through a Kafka topic. This is currently
@@ -7,7 +12,10 @@ import org.apache.kafka.clients.producer.{ KafkaProducer, ProducerRecord }
  * can be later modified to read from any kind of real-time source, such as a web-page
  * with a chat window, a Twitter account, an email inbox, command-line args, etc.
  */
-object Producer extends App {
+object Producer extends ServerApp {
+
+  implicit val S = scalaz.concurrent.Strategy.DefaultTimeoutScheduler
+
   def initializeProducer(zkServer: String): KafkaProducer[String, String] = {
     import java.util.Properties
 
@@ -28,10 +36,24 @@ object Producer extends App {
 
   val producer = initializeProducer("localhost:9092")
 
-  val messages = List("So glad I'm never going to have children")
-  messages foreach { msg =>
+  def sendMessage(msg: String) = {
     val resp = producer.send(msg).get()
-    println(s"Sending message: $msg - Response: $resp")
+    s"Sending message: $msg - Response: $resp"
   }
+
+  object MsgParam extends QueryParamDecoderMatcher[String]("msg")
+
+  val helloWorldService = HttpService {
+    case GET -> Root / "ping" =>
+      Ok("pong")
+
+    case GET -> Root / "send" :? MsgParam(message) =>
+      Ok( sendMessage( message ) )
+  }
+
+  val bindPort = sys.env.getOrElse( "PORT", "8080" ).toInt
+  val builder = BlazeBuilder.bindHttp( bindPort, "0.0.0.0" ).mountService( helloWorldService, "/" )
+
+  override def server( args: List[String] ): Task[Server] = builder.start
 
 }
