@@ -10,51 +10,60 @@ import com.datastax.spark.connector.SomeColumns
 import com.datastax.spark.connector.streaming._
 import java.util.UUID
 import scala.sys.process._
-
-case class Message(message: String) {
-  val id = UUID.randomUUID()
-  val len = message.length
-}
+import Models._
 
 /* This doesn't currently do any real analysis--it just reads from the topic, gets the
  * length of messages, and stores this in Cassandra with the message's UUID as the key.
  */
 object Consumer extends App {
+
+  case class Message(message: String, response: String) {
+    val id = UUID.randomUUID()
+  }
+
+  def getExectutionContext(dbUri: String) = {
+    val appName = "harmonia"
+    val master = "local[2]"
+
+    val conf = new SparkConf().
+      setAppName(appName).
+      setMaster(master).
+      set("spark.cassandra.connection.host", dbUri)
+
+    new StreamingContext(conf, Seconds(1))
+  }
+
+  def getInputStream(ssc: StreamingContext, topics: Array[String]) = {
+
+    val kafkaParams = Map[String, Object](
+      "bootstrap.servers" -> "localhost:9092",
+      "key.deserializer" -> classOf[StringDeserializer],
+      "value.deserializer" -> classOf[StringDeserializer],
+      "group.id" -> "use_a_separate_group_id_for_each_stream",
+      "auto.offset.reset" -> "latest",
+      "enable.auto.commit" -> (false: java.lang.Boolean)
+    )
+
+    KafkaUtils.createDirectStream[String, String](
+      ssc,
+      PreferConsistent,
+      Subscribe[String, String](topics, kafkaParams)
+    )
+  }
+
   val cassandraHost = "127.0.0.1"
   val keyspace = "test"
   val table = "messages"
 
-  val appName = "harmonia"
-  val master = "local[2]"
+  val ssc = getExectutionContext(cassandraHost)
 
-  val conf = new SparkConf().
-    setAppName(appName).
-    setMaster(master).
-    set("spark.cassandra.connection.host", cassandraHost)
-
-  val ssc = new StreamingContext(conf, Seconds(1))
-
-  val kafkaParams = Map[String, Object](
-    "bootstrap.servers" -> "localhost:9092",
-    "key.deserializer" -> classOf[StringDeserializer],
-    "value.deserializer" -> classOf[StringDeserializer],
-    "group.id" -> "use_a_separate_group_id_for_each_stream",
-    "auto.offset.reset" -> "latest",
-    "enable.auto.commit" -> (false: java.lang.Boolean)
-  )
-
-  val topics = Array("test")
-  val stream = KafkaUtils.createDirectStream[String, String](
-    ssc,
-    PreferConsistent,
-    Subscribe[String, String](topics, kafkaParams)
-  )
-
+  val stream = getInputStream(ssc, Array("test"))
   val msgs = stream.map(record => {
-    s"say ${record.value}".!
-    Message(record.value)
+    val resp = SimpleLookupModel(record.value)
+    s"say $resp".!
+    Message(record.value, resp)
   })
-  msgs.saveToCassandra(keyspace, table, SomeColumns("id", "message", "len"))
+  msgs.saveToCassandra(keyspace, table, SomeColumns("id", "message", "response"))
 
   ssc.start()
   ssc.awaitTermination()

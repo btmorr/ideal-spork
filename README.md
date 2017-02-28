@@ -7,17 +7,18 @@ Intial start based on info gleaned from:
 - [general Spark Streaming guide](https://spark.apache.org/docs/latest/streaming-programming-guide.html)
 - [Spark Streaming Kafka Integration guide](https://spark.apache.org/docs/latest/streaming-kafka-0-10-integration.html)
 
-The above is sufficient for the general kinds of operations available within the Spark ecosystem, including [GraphX](https://spark.apache.org/graphx/) ops and whatnot. One really interesting tie-in would be using neural networks within this context though. See:
+The above is sufficient for the general kinds of operations available within the Spark ecosystem, including [GraphX](https://spark.apache.org/graphx/) ops and whatnot. 
 
-- [TensorFlow on Spark](http://yahoohadoop.tumblr.com/post/157196317141/open-sourcing-tensorflowonspark-distributed-deep)
-- in conjunction with [Debo Datta's blog](http://debajyotidatta.github.io/nlp/deep/learning/word-embeddings/2016/11/27/Understanding-Convolutions-In-Text/)
+## Models
 
-Example of a larger-scale kafka deploy setup from [clairvoyansoft's blog](http://site.clairvoyantsoft.com/kafka-great-choice-large-scale-event-processing/)
+The `Models` object contains interfaces for grabbing various kinds of predictions, whether those are run within the app, or accessed through API calls to external services (as with models that are tied to another language, such as Tensorflow networks)
 
-On Cassandra:
+Worth looking into:
 
-- [Designing indicies](http://outworkers.com/blog/post/a-series-on-cassandra-part-1-getting-rid-of-the-sql-mentality)
-- [Using Cassandra with Spark Streaming](https://github.com/datastax/spark-cassandra-connector/blob/master/doc/8_streaming.md)
+-  [Debo Datta's blog](http://debajyotidatta.github.io/nlp/deep/learning/word-embeddings/2016/11/27/Understanding-Convolutions-In-Text/)
+- [Vowpal Wabbit](https://github.com/JohnLangford/vowpal_wabbit/wiki/Tutorial)
+ - [Java interface](http://search.maven.org/#search|gav|1|g%3A"com.github.johnlangford"%20AND%20a%3A"vw-jni")
+ - [An entity relation example](https://github.com/JohnLangford/vowpal_wabbit/tree/8.1.1/demo/entityrelation) that seems to have been removed or moved in 8.2(???) but should still provide a valid example for training/running a model
 
 ## Developing
 
@@ -55,6 +56,8 @@ To set up a topic (only has to be done once per topic):
 $KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
 ```
 
+Example of a larger-scale Kafka deploy setup from [clairvoyansoft's blog](http://site.clairvoyantsoft.com/kafka-great-choice-large-scale-event-processing/)
+
 ### Launching Cassandra
 
 If Cassandra's 'bin' directory is included on your PATH, you can simply run `cassandra` to start the server (the terminal process will return, but the server will still be up. You can verify this and interact with the database by opening the CQL shell: `cqlsh`.
@@ -63,7 +66,7 @@ Before reading/writing, you have to set up the keyspace and table (this only has
 
 ```
 cqlsh> CREATE KEYSPACE IF NOT EXISTS test WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
-cqlsh> CREATE TABLE IF NOT EXISTS test.messages(id UUID, message TEXT, len INT, PRIMARY KEY(id));
+cqlsh> CREATE TABLE IF NOT EXISTS test.messages(id UUID, message TEXT, response TEXT, PRIMARY KEY(id));
 cqlsh>
 ```
 
@@ -72,6 +75,12 @@ After sending some messages through, view them by:
 ```
 cqlsh> select * from test.messages
 ```
+
+Notes on Cassandra:
+
+- [Designing indicies](http://outworkers.com/blog/post/a-series-on-cassandra-part-1-getting-rid-of-the-sql-mentality)
+- [Using Cassandra with Spark Streaming](https://github.com/datastax/spark-cassandra-connector/blob/master/doc/8_streaming.md)
+
 
 ## Running the application
 
