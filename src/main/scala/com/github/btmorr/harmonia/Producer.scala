@@ -55,5 +55,20 @@ object Producer extends ServerApp {
   val builder = BlazeBuilder.bindHttp( bindPort, "0.0.0.0" ).mountService( helloWorldService, "/" )
 
   override def server( args: List[String] ): Task[Server] = builder.start
+  /* Ideas for app side:
+   * - add login and user session components, and feature flags per user. Similarly, but a little 
+   *   different, if the AI is just another chatter, then could make the feature flags a part of
+   *   an AI identity instead of a user profile, such that the user interacts with a particular
+   *   agent, and that agent uses particular models/features, so that the experience would vary  
+   *   by which AI was participating in the convo, rather than by which human. This could make for
+   *   a less-coupled system (the chat program tracking which users are logged in, and the AI engine
+   *   keeping track of which agent uses which models), and also easier comparison of the behaviors of
+   *   two agents, or two versions of an agent, as an agent would usually just be two unique mixtures
+   *   of models (including version changes).
+   * - look into scala.js or other frameworks to serve up content while keeping this predominantly scala
+   * - learn how to have the content auto-refresh when content comes back from the AI side (AI as another
+   *   user chatting with the human, rather than fulfilling a backend request?)--should be able to follow
+   *   a simple webchat tutorial.
+   */
 
 }

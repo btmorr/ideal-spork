@@ -19,6 +19,7 @@ Worth looking into:
 - [Vowpal Wabbit](https://github.com/JohnLangford/vowpal_wabbit/wiki/Tutorial)
  - [Java interface](http://search.maven.org/#search|gav|1|g%3A"com.github.johnlangford"%20AND%20a%3A"vw-jni")
  - [An entity relation example](https://github.com/JohnLangford/vowpal_wabbit/tree/8.1.1/demo/entityrelation) that seems to have been removed or moved in 8.2(???) but should still provide a valid example for training/running a model
+- [Edward](http://edwardlib.org)
 
 ## Developing
 

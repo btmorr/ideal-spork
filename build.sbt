@@ -20,5 +20,6 @@ libraryDependencies ++= Seq(
   "org.apache.spark"   %% "spark-sql" % "2.1.0",
   "org.apache.spark"   %% "spark-streaming" % "2.1.0",
   "org.apache.spark"   %% "spark-streaming-kafka-0-10" % "2.1.0",
+  "edu.stanford.nlp"    % "stanford-corenlp" % "3.7.0",
   "org.scalatest"      %% "scalatest" % "3.0.0" % "test"
 )
