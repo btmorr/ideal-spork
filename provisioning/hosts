@@ -1,0 +1,17 @@
+[hadoop_all:children]
+zookeeper
+kafka
+cassandra
+spark
+
+[zookeeper]
+zk1
+
+[kafka]
+kafka1
+
+[cassandra]
+cass1
+
+[spark]
+spark1

@@ -1,6 +1,37 @@
 # ideal-spork
 A toy, starting with Spark Streaming + Kafka (the repo name was randomly generated). Currently, either the bundled Kafka producer terminal, or the Producer application will emit a series of messages, which are transmitted over Kafka, picked up by the Consumer, written to Cassandra, and said out loud (if you're on a Mac) with the `say` command. :p
 
+## Getting Started
+
+### Running the system
+
+The only native requirement for running the application is [Vagrant](https://www.vagrantup.com/docs/installation/). Once you have Vagrant installed, add the host manager (takes care of networking between Vagrant boxes):
+ 
+```
+$ vagrant plugin install vagrant-hostmanager
+```
+
+Then navigate in the terminal to where you have this repository checked out, and:
+
+```
+$ vagrant up
+```
+
+This causes a number of things to happen. 
+
+1. Vagrant brings up a command box that is used to provision other boxes via Ansible playbooks. 
+1. Other boxes are created for the [ZooKeeper](http://zookeeper.apache.org/), [Kafka](https://kafka.apache.org/), [Spark](http://spark.apache.org/), and [Cassandra](https://cassandra.apache.org/) nodes (currently only one of each type--this could definetly be improved by modifying the configs and adding nodes to make this actually distributed).
+1. Ansible provisions each of those boxes accordingly, installing the specified software, configuring it, and bringing up the relevant processes.
+1. 
+
+Whenever you're done, you can free up the resources allocated with a disproportinately satisfying command:
+
+```
+$ vagrant destroy
+```
+
+## Notes
+
 Intial start based on info gleaned from:
 
 - [ampcamp exercise](http://ampcamp.berkeley.edu/3/exercises/realtime-processing-with-spark-streaming.html)
@@ -34,14 +65,6 @@ This also could be used to capture human<->human chats as data for training the 
 ## Developing
 
 To get started, you have to have the [Stanford CoreNLP models](http://stanfordnlp.github.io/CoreNLP/) downloaded to the "lib" folder.
- 
-You also have to have [Kafka](https://kafka.apache.org/downloads) (version >= 0.10.0.0), [Spark](http://spark.apache.org/downloads) (version >= 2.1.0), and [Cassandra](https://cassandra.apache.org/download/) installed (preferably included in the PATH), with the $SPARK_HOME and $KAFKA_HOME environment variables set. Instructions below assume you have these variables correclty configured.
-
-In its current state, the app has been test-driven with:
-
-- Kafka 0.10.2.0
-- Spark 2.1.0
-- Cassandra 3.10
 
 ## Setting up the stack
 

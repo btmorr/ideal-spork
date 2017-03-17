@@ -1,0 +1,26 @@
+---
+
+- hosts: zookeeper
+  sudo: yes
+  pre_tasks:
+    - lineinfile: dest=/etc/hosts state=absent regexp="^127.0.1.1" #If found, zookeeper binds to localhost address
+  vars:
+    java_versions: oracle-jdk8-installer
+  roles:
+  - { role: ansible-zookeeper }
+  - { role: ansible-role-ntp }
+
+- hosts: kafka
+  roles:
+  - { role: ansible-kafka }
+  - { role: ansible-role-ntp }
+
+- hosts: cassandra
+  roles:
+  #- { role: ansible-cassandra }
+  - { role: ansible-role-ntp }
+
+- hosts: spark
+  roles:
+  #- { role: ansible-spark }
+  - { role: ansible-role-ntp }
