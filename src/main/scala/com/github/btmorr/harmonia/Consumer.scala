@@ -10,7 +10,7 @@ import com.datastax.spark.connector.SomeColumns
 import com.datastax.spark.connector.streaming._
 import java.util.UUID
 
-import Models._
+import models._
 
 /* This doesn't currently do any real analysis--it just reads from the topic, gets the
  * length of messages, and stores this in Cassandra with the message's UUID as the key.
@@ -49,11 +49,11 @@ object Consumer {
     val msgs = testStream.map( _.value )
 
     // This pipe is currently dead-end at the dummy vw model
-    val sentences = msgs.flatMap( in => SentenceSegmenter( in ) )
+    val sentences = msgs.flatMap( in => models.SentenceSegmenter( in ) )
     val lemmaTagPairs = sentences.flatMap( s => LemmatizerTagger( s ) )
     val vwPredictions = lemmaTagPairs.map{ case (word, tag) => (word, SearnPredictor( (word, tag) ) ) }
 
-    val simpleResponses = msgs.map( in => (in, SimpleLookupModel( in ) ) )
+    val simpleResponses = msgs.map( in => (in, SimpleLookup( in ) ) )
     val responses = simpleResponses.map{
       case (in, resp) => Message( in, SayIt( resp ) )
     }

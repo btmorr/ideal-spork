@@ -37,6 +37,7 @@ object Producer extends ServerApp {
   val producer = initializeProducer("localhost:9092")
 
   def sendMessage(msg: String) = {
+    println(s"Got input: $msg")
     val resp = producer.send(msg).get()
     s"Sending message: $msg - Response: $resp"
   }

@@ -15,15 +15,27 @@ The `Models` object contains interfaces for grabbing various kinds of prediction
 
 Worth looking into:
 
--  [Debo Datta's blog](http://debajyotidatta.github.io/nlp/deep/learning/word-embeddings/2016/11/27/Understanding-Convolutions-In-Text/)
+- [Debo Datta's blog](http://debajyotidatta.github.io/nlp/deep/learning/word-embeddings/2016/11/27/Understanding-Convolutions-In-Text/)
 - [Vowpal Wabbit](https://github.com/JohnLangford/vowpal_wabbit/wiki/Tutorial)
- - [Java interface](http://search.maven.org/#search|gav|1|g%3A"com.github.johnlangford"%20AND%20a%3A"vw-jni")
- - [An entity relation example](https://github.com/JohnLangford/vowpal_wabbit/tree/8.1.1/demo/entityrelation) that seems to have been removed or moved in 8.2(???) but should still provide a valid example for training/running a model
+    - [Java interface](http://search.maven.org/#search|gav|1|g%3A"com.github.johnlangford"%20AND%20a%3A"vw-jni")
+    - [An entity relation example](https://github.com/JohnLangford/vowpal_wabbit/tree/8.1.1/demo/entityrelation) that seems to have been removed or moved in 8.2(???) but should still provide a valid example for training/running a model
 - [Edward](http://edwardlib.org)
+- [General reinforcement learning resources](http://www.wildml.com/2016/10/learning-reinforcement-learning/)
+- [Updated Parsey McParseface](https://research.googleblog.com/2017/03/an-upgrade-to-syntaxnet-new-models-and.html)
+
+## Interaction
+
+Main idea is chatting with the AI in a chatroom. The AI will be logged into a user session just like a human, and the chat application doesn't have to be aware of the AI (aside from possibly exposing whatever the AI pipe needs to know when a message has come in and read it). This means the chat app can be put together from a tutorial, largely independent of the design of the AI. Current state of the app is just an endpoint hooked up to a Kafka producer, so this concept hasn't been put into practice at all, but that's the plan.
+
+This also could be used to capture human<->human chats as data for training the bot.
+
+[Http4s](http://http4s.org/v0.16/entity/) bundles [twirl](https://github.com/playframework/twirl) for serving templates, so this should be able to avoid JS (or resort to Scala.js if necessary)
 
 ## Developing
 
-To get started, you have to have [Kafka](https://kafka.apache.org/downloads) (version >= 0.10.0.0), [Spark](http://spark.apache.org/downloads) (version >= 2.1.0), and [Cassandra](https://cassandra.apache.org/download/) installed (preferably included in the PATH), with the $SPARK_HOME and $KAFKA_HOME environment variables set. Instructions below assume you have these variables correclty configured.
+To get started, you have to have the [Stanford CoreNLP models](http://stanfordnlp.github.io/CoreNLP/) downloaded to the "lib" folder.
+ 
+You also have to have [Kafka](https://kafka.apache.org/downloads) (version >= 0.10.0.0), [Spark](http://spark.apache.org/downloads) (version >= 2.1.0), and [Cassandra](https://cassandra.apache.org/download/) installed (preferably included in the PATH), with the $SPARK_HOME and $KAFKA_HOME environment variables set. Instructions below assume you have these variables correclty configured.
 
 In its current state, the app has been test-driven with:
 
@@ -86,3 +98,13 @@ Notes on Cassandra:
 ## Running the application
 
 Start the Consumer and the Producer, then navigate to [localhost:8080](http://localhost:8080). The root page won't display anything at the moment, but you can hit the "send" route and add body text under the [`msg` parameter](http://localhost:8080/send?msg=hello-world) to send a message along and have the computer say it.
+
+
+## Dev Plan
+
+Currently, everything runs natively. The next step is to take everything that is currently running, and the required infrastructure, and automate the process of provisioning, install, etc using some combination of Vagrant and Ansible.
+
+After that, separate components will run on their own nodes, exactly as they would in an actual distributed environment.
+
+
+Copyright (c) 2017 Benjamin Morris
