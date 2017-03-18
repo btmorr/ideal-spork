@@ -3,6 +3,8 @@ zookeeper
 kafka
 cassandra
 spark
+chat
+mind
 
 [zookeeper]
 zk1
@@ -15,3 +17,9 @@ cass1
 
 [spark]
 spark1
+
+[chat]
+chat1
+
+[mind]
+mastermind1

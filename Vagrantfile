@@ -3,10 +3,8 @@
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure configures the configuration version
 # (we support older styles for backwards compatibility). Please don't change it unless you know what you're doing.
+
 Vagrant.configure("2") do |config|
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
 
   config.vm.box = "ubuntu/xenial64"
   config.vm.box_version = "20170316.3.0"
@@ -17,11 +15,10 @@ Vagrant.configure("2") do |config|
   project_name = File.basename(Dir.getwd)
 
   config.vm.define project_name do |node|
-    node.vm.network :private_network, :ip => '192.168.121.10'
+    node.vm.network :private_network, :ip => '192.168.121.4'
     config.vm.synced_folder './provisioning', "/home/vagrant/#{project_name}"
     config.vm.provision :ansible do |ansible|
-      ansible.playbook = './build.yml'
-      ansible.inventory_path = './hosts'
+      ansible.playbook = './bootstrap.yml'
       ansible.host_key_checking = false
       ansible.extra_vars = {
         ansible_ssh_user: 'vagrant',
@@ -37,39 +34,43 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define 'kafka1' do |node|
-    node.vm.network :private_network, :ip => '192.168.121.12'
+    node.vm.network :private_network, :ip => '192.168.121.21'
     config.vm.host_name = 'kafka1'
   end
 
   config.vm.define 'cass1' do |node|
-    node.vm.network :private_network, :ip => '192.168.121.13'
+    node.vm.network :private_network, :ip => '192.168.121.31'
     config.vm.host_name = 'cass1'
   end
 
   config.vm.define 'spark1' do |node|
-    node.vm.network :private_network, :ip => '192.168.121.14'
+    node.vm.network :private_network, :ip => '192.168.121.41'
     config.vm.host_name = 'spark1'
   end
 
   config.vm.define 'standford1' do |node|
-    node.vm.network :private_network, :ip => '192.168.121.15'
+    node.vm.network :private_network, :ip => '192.168.121.51'
     config.vm.host_name = 'stanford1'
   end
 
+  config.vm.define 'chat1' do |node|
+    node.vm.network :private_network, :ip => '192.168.121.100'
+    config.vm.host_name = 'chat1'
+  end
+
+  config.vm.define 'mastermind1' do |node|
+    node.vm.network :private_network, :ip => '192.168.121.200'
+    config.vm.host_name = 'mastermind1'
+  end
+
   config.vm.provision :ansible do |ansible|
-    ansible.playbook = './vagrant-ansible.yml'
+    ansible.playbook = './build.yml'
+    ansible.inventory_path = './hosts'
     ansible.extra_vars = {
       ansible_ssh_user: 'vagrant',
       sudo: true
     }
     ansible.host_key_checking = false
-    ansible.groups = {
-      'zookeeper' => [ 'zk1' ],
-      'kafka'     => [ 'kafka1' ],
-      'cassandra' => [ 'cass1' ],
-      'spark'     => [ 'spark1' ],
-      'stanford'  => [ 'stanford1' ],
-    }
 
   end
 

@@ -1,0 +1,15 @@
+---
+
+- name: 'provisioning box'
+
+  hosts: provisioning
+
+  pre_tasks:
+
+    # Most vagrant boxes have outdated repositories
+    - name: APT update
+      sudo: yes
+      apt: update_cache=yes
+
+  roles:
+    - { role: ansible-base }

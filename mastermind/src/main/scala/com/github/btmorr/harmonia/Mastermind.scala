@@ -15,7 +15,7 @@ import models._
 /* This doesn't currently do any real analysis--it just reads from the topic, gets the
  * length of messages, and stores this in Cassandra with the message's UUID as the key.
  */
-object Consumer {
+object Mastermind {
   case class Message(message: String, response: String) {
     val id = UUID.randomUUID()
   }

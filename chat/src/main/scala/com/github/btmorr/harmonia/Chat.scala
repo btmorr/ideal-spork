@@ -12,7 +12,7 @@ import org.apache.kafka.clients.producer.{ KafkaProducer, ProducerRecord }
  * can be later modified to read from any kind of real-time source, such as a web-page
  * with a chat window, a Twitter account, an email inbox, command-line args, etc.
  */
-object Producer extends ServerApp {
+object Chat extends ServerApp {
 
   implicit val S = scalaz.concurrent.Strategy.DefaultTimeoutScheduler
 
