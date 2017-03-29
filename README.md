@@ -5,30 +5,7 @@ A toy, starting with Spark Streaming + Kafka (the repo name was randomly generat
 
 ### Building and booting the system
 
-The only native requirement for running the application is [Vagrant](https://www.vagrantup.com/docs/installation/). Once you have Vagrant installed, add the host manager (takes care of networking between Vagrant boxes):
- 
-```
-$ vagrant plugin install vagrant-hostmanager
-```
-
-Then navigate in the terminal to where you have this repository checked out, and:
-
-```
-$ vagrant up
-```
-
-This causes a number of things to happen. 
-
-1. Vagrant brings up a command box that is used to provision other boxes via Ansible playbooks. 
-1. Other boxes are created for the [ZooKeeper](http://zookeeper.apache.org/), [Kafka](https://kafka.apache.org/), [Spark](http://spark.apache.org/), and [Cassandra](https://cassandra.apache.org/) nodes (currently only one of each type--this could definetly be improved by modifying the configs and adding nodes to make this actually distributed).
-1. Boxes are created for the apps from this project: a chat server in which users can chat with AI agents, and Mastermind, in which the agents reside.
-1. Ansible provisions each of those boxes accordingly, installing the specified software, configuring it, and bringing up the relevant processes.
-
-Whenever you're done, you can free up the resources allocated with a disproportinately satisfying command:
-
-```
-$ vagrant destroy
-```
+[tbd]
 
 ### Interacting with the system
 
@@ -52,6 +29,8 @@ Intial start based on info gleaned from:
 - [Spark Streaming Kafka Integration guide](https://spark.apache.org/docs/latest/streaming-kafka-0-10-integration.html)
 
 The above is sufficient for the general kinds of operations available within the Spark ecosystem, including [GraphX](https://spark.apache.org/graphx/) ops and whatnot. 
+
+For a primer on asynchrony, check out [this blog post](https://alexn.org/blog/2017/01/30/asynchronous-programming-scala.html)
 
 ### Models
 
@@ -132,12 +111,6 @@ Notes on Cassandra:
 
 Start the Consumer and the Producer, then navigate to [localhost:8080](http://localhost:8080). The root page won't display anything at the moment, but you can hit the "send" route and add body text under the [`msg` parameter](http://localhost:8080/send?msg=hello-world) to send a message along and have the computer say it.
 
-
-## Dev Plan
-
-Currently, everything runs natively. The next step is to take everything that is currently running, and the required infrastructure, and automate the process of provisioning, install, etc using some combination of Vagrant and Ansible.
-
-After that, separate components will run on their own nodes, exactly as they would in an actual distributed environment. This could include running Stanford Core NLP as a service instead of using it as a library.
 
 
 Copyright (c) 2017 Benjamin Morris
