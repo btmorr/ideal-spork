@@ -21,12 +21,10 @@ object Mastermind {
   }
 
   def main(args: Array[String]) = {
+    import AppConfig.{ CassandraConfig, KafkaConfig, SparkConfig }
 
-    val cassandraHost = "127.0.0.1"
-    val keyspace = "test"
-    val table = "messages"
 
-    val ssc = getExectutionContext(cassandraHost)
+    val ssc = getExectutionContext(SparkConfig.appName, SparkConfig.master, CassandraConfig.hostUri)
 
     /* Modify this to put the message through a dag of models, possibly including human
      * interfaces. At each point in the process, persist the stage input and output, along
@@ -45,8 +43,8 @@ object Mastermind {
      * appear to have just described Apache Apex almost exactly, but that seems like overkill for
      * this toy...
      */
-    val testStream = getInputStream(ssc, Array("test"))
-    val msgs = testStream.map( _.value )
+    val stream = getInputStream(ssc, KafkaConfig.topics)
+    val msgs = stream.map( _.value )
 
     // This pipe is currently dead-end at the dummy vw model
     val sentences = msgs.flatMap( in => models.SentenceSegmenter( in ) )
@@ -57,25 +55,25 @@ object Mastermind {
     val responses = simpleResponses.map{
       case (in, resp) => Message( in, SayIt( resp ) )
     }
-    responses.saveToCassandra(keyspace, table, SomeColumns("id", "message", "response"))
+    responses.saveToCassandra(CassandraConfig.keyspace, CassandraConfig.table, SomeColumns("id", "message", "response"))
 
     ssc.start()
     ssc.awaitTermination()
   }
 
 
-  private def getExectutionContext(dbUri: String) = {
-    val appName = "harmonia"
-    val master = "local[2]"
+  private def getExectutionContext(appName: String, sparkMaster: String, cassandraUri: String) = {
 
     val conf = new SparkConf().
       setAppName(appName).
-      setMaster(master).
-      set("spark.cassandra.connection.host", dbUri)
+      setMaster(sparkMaster).
+      set("spark.cassandra.connection.host", cassandraUri)
 
     new StreamingContext(conf, Seconds(1))
   }
 
+  // have tried to make this polymorphic over deserializer type, but having trouble
+  // getting the right type for the fields
   private def getInputStream(ssc: StreamingContext, topics: Array[String]) = {
 
     val kafkaParams = Map[String, Object](

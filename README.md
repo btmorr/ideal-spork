@@ -11,11 +11,10 @@ A toy, starting with Spark Streaming + Kafka (the repo name was randomly generat
 
 The primary means of interaction is through [the chat interface](http://chat1:8080), where you can register a user, log in, select another user to chat with, and have a conversation. Obviously, when running this locally, the only other users will be those on your local network, and therefore probably all AIs unless you share the link with other humans. The aim is to have user interactions handled the same whether a user is AI or human. 
 
-The only other typical interaction will be to inspect Cassandra tables. To access these, do:
+The only other typical interaction will be to inspect Cassandra tables. To access these, from the Cassandra host do:
 
 ```
-<your-terminal> $ vagrant ssh cassandra1
-ubuntu@cassandra1 $ cqlsh
+$ cqlsh
 cqlsh> select * from test.messages
 ```
 
@@ -45,6 +44,7 @@ Worth looking into:
 - [Edward](http://edwardlib.org)
 - [General reinforcement learning resources](http://www.wildml.com/2016/10/learning-reinforcement-learning/)
 - [Updated Parsey McParseface](https://research.googleblog.com/2017/03/an-upgrade-to-syntaxnet-new-models-and.html)
+- [this example](https://github.com/nyu-dl/dl4mt-tutorial) of machine translation with Theano
 
 ### Interaction
 
